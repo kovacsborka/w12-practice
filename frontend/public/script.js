@@ -14,6 +14,17 @@ const userComponent = ({name, surname, age}) => {
     `
 }
 
+
+const addUserComponent = () => {
+    return `
+    <div>
+        <input type="text" placeholder="Firstname" name="firstname" >
+        <input type="text" placeholder="Surname" name="surname" >
+        <button>Send</button>
+    </div>
+    `
+}
+
 const loadEvent = async () => {
 
     const result = await parseJSON('/api/v1/users');
@@ -23,6 +34,8 @@ const loadEvent = async () => {
         'beforeend', 
         result.map( user => userComponent(user)).join('')
     )
+
+    rootElement.insertAdjacentHTML('afterend', addUserComponent())
 };
 
 window.addEventListener("load", loadEvent)

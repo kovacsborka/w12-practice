@@ -6,7 +6,14 @@ const path = require("path");
 
 const port = 9000
 
+
 const app = express();
+
+const ffolder = `${__dirname}/../frontend`
+
+app.use('/public', express.static(`${ffolder}/public`));
+
+
 //az appnak adunk egy GET requestet ( get(url, callback function) )
 //paraméterek: request, response, next
 app.get('/', (req, res, next) => {
@@ -22,6 +29,13 @@ app.get('/', (req, res, next) => {
 
     //frontenden jeleníti meg
     res.sendFile(path.join(`${__dirname}/../frontend/index.html`));
+} )
+
+
+app.get('/admin/order-view', (req, res, next) => {
+
+    res.sendFile(path.join(`${__dirname}/../frontend/index.html`));
+
 } )
 
 
@@ -72,6 +86,37 @@ app.get('/api/v1/users', (req, res, next) => {
 
 
 
+app.get('/api/v1/users-query', (req, res, next) => {
+    console.dir(req.query.apiKey)
+
+    
+    if (req.query.apiKey === "apple") {
+        res.sendFile(userFile)
+    } else {
+        res.send('Unauthorized request')
+    }
+
+    
+} )
+
+/*
+app.get('/api/v1/users-params/:key', (req, res, next) => {
+    console.dir(req.params)
+    console.log(req.params.key)
+    // res.send('helloka')
+    
+
+    if (req.params.key === "apple") {
+        res.send("you typed in apple")
+    } else {
+        res.send("you didnt type in apple")
+    }
+    
+    
+} )
+*/
+
+/*
 //passzív aktív userek
 app.get('/api/v1/users/active', (req, res, next) => {
     //fs module, readfile (elérési útvonal, callback func)
@@ -103,12 +148,44 @@ app.get('/api/v1/users/passive', (req, res, next) => {
         }
     })
 } )
+*/
+
+
+app.get('/api/v1/users-params/:key', (req, res, next) => {
+    console.dir(req.params)
+    console.log(req.params.key)
+    // res.send('helloka')
+    
+    /*
+    if (req.params.key === "active") {
+        //res.send("you typed in apple")
+        res.send(users.filter(user => user.status === "active"))
+    } else if (req.params.key === "passive") {
+        //res.send("you didnt type in apple")
+        res.send(users.filter(user => user.status === "passive"))
+    }
+    */
+    
+    fs.readFile(userFile, (err, data) => {
+        const users = JSON.parse(data)
+        if (err) {
+            res.send("Something went wrong")
+        }
+        else if (req.params.key === "passive") {
+            
+            res.send(users.filter(user => user.status === "passive"))
+
+        } else if (req.params.key === "active") {
+           
+            res.send(users.filter(user => user.status === "active"))
+
+        }
+    })
+    
+} )
 
 
 
-
-
-app.use('/public', express.static(`${__dirname}/../frontend/public`));
 
 //lefuttatás
 app.listen(port, () => {
